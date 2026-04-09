@@ -1,0 +1,250 @@
+﻿.FF                                                                      [100%]
+================================== FAILURES ===================================
+______________________________ test_create_user _______________________________
+venv\lib\site-packages\sqlalchemy\engine\base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+venv\lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+tests\test_api.py:9: in test_create_user
+    response = client.post("/users/", json={
+venv\lib\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+venv\lib\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+venv\lib\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+venv\lib\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+venv\lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+venv\lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv\lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+venv\lib\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+venv\lib\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+venv\lib\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv\lib\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py:458: in result
+    return self.__get_result()
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py:403: in __get_result
+    raise self._exception
+venv\lib\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+venv\lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+venv\lib\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+venv\lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv\lib\site-packages\starlette\middleware\cors.py:88: in __call__
+    await self.app(scope, receive, send)
+venv\lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv\lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+venv\lib\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv\lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\lib\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+venv\lib\site-packages\fastapi\routing.py:674: in app
+    raw_response = await run_endpoint_function(
+venv\lib\site-packages\fastapi\routing.py:330: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+venv\lib\site-packages\starlette\concurrency.py:32: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+venv\lib\site-packages\anyio\to_thread.py:63: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv\lib\site-packages\anyio\_backends\_asyncio.py:2518: in run_sync_in_worker_thread
+    return await future
+venv\lib\site-packages\anyio\_backends\_asyncio.py:1002: in run
+    result = context.run(func, *args)
+app\main.py:34: in create_user
+    db_user = crud.get_user(db, user_uid=user.uid)
+app\crud.py:6: in get_user
+    return db.query(models.User).filter(models.User.uid == user_uid).first()
+venv\lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+venv\lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\lib\site-packages\sqlalchemy\orm\session.py:2351: in execute
+    return self._execute_internal(
+venv\lib\site-packages\sqlalchemy\orm\session.py:2249: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1419: in execute
+    return meth(
+venv\lib\site-packages\sqlalchemy\sql\elements.py:527: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1641: in _execute_clauseelement
+    ret = self._execute_context(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1846: in _execute_context
+    return self._exec_single_context(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1986: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\lib\site-packages\sqlalchemy\engine\base.py:2363: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\lib\site-packages\sqlalchemy\engine\base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+venv\lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   [SQL: SELECT users.uid AS users_uid, users.name AS users_name, users.email AS users_email, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.uid = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: ('test_user_1', 1, 0)]
+E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
+______________________________ test_create_group ______________________________
+venv\lib\site-packages\sqlalchemy\engine\base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+venv\lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+tests\test_api.py:25: in test_create_group
+    client.post("/users/", json={"uid": "mock_uid", "name": "Mock User", "email": "mock@test.com"})
+venv\lib\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+venv\lib\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+venv\lib\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+venv\lib\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+venv\lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+venv\lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv\lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+venv\lib\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+venv\lib\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+venv\lib\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv\lib\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py:458: in result
+    return self.__get_result()
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\lib\concurrent\futures\_base.py:403: in __get_result
+    raise self._exception
+venv\lib\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+venv\lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+venv\lib\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+venv\lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv\lib\site-packages\starlette\middleware\cors.py:88: in __call__
+    await self.app(scope, receive, send)
+venv\lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv\lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+venv\lib\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+venv\lib\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv\lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\lib\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+venv\lib\site-packages\fastapi\routing.py:674: in app
+    raw_response = await run_endpoint_function(
+venv\lib\site-packages\fastapi\routing.py:330: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+venv\lib\site-packages\starlette\concurrency.py:32: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+venv\lib\site-packages\anyio\to_thread.py:63: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv\lib\site-packages\anyio\_backends\_asyncio.py:2518: in run_sync_in_worker_thread
+    return await future
+venv\lib\site-packages\anyio\_backends\_asyncio.py:1002: in run
+    result = context.run(func, *args)
+app\main.py:34: in create_user
+    db_user = crud.get_user(db, user_uid=user.uid)
+app\crud.py:6: in get_user
+    return db.query(models.User).filter(models.User.uid == user_uid).first()
+venv\lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+venv\lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\lib\site-packages\sqlalchemy\orm\session.py:2351: in execute
+    return self._execute_internal(
+venv\lib\site-packages\sqlalchemy\orm\session.py:2249: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1419: in execute
+    return meth(
+venv\lib\site-packages\sqlalchemy\sql\elements.py:527: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1641: in _execute_clauseelement
+    ret = self._execute_context(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1846: in _execute_context
+    return self._exec_single_context(
+venv\lib\site-packages\sqlalchemy\engine\base.py:1986: in _exec_single_context
+    self._handle_dbapi_exception(
+venv\lib\site-packages\sqlalchemy\engine\base.py:2363: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\lib\site-packages\sqlalchemy\engine\base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+venv\lib\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+E   [SQL: SELECT users.uid AS users_uid, users.name AS users_name, users.email AS users_email, users.created_at AS users_created_at 
+E   FROM users 
+E   WHERE users.uid = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: ('mock_uid', 1, 0)]
+E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
+============================== warnings summary ===============================
+app\schemas.py:5
+  F:\Projects\SplitEasy\backend\app\schemas.py:5: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ORMBase(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::test_create_user - sqlalchemy.exc.OperationalError:...
+FAILED tests/test_api.py::test_create_group - sqlalchemy.exc.OperationalError...
+2 failed, 1 passed, 1 warning in 1.80s

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base App Theme (We rely heavily on Jetpack Compose for the actual views) -->
+    <style name="Theme.SplitEasy" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#0F172A</item>
+    </style>
+
+    <!-- Splash Screen API Theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background -->
+        <item name="windowSplashScreenBackground">#0F172A</item>
+        <!-- Set the splash screen icon -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_split_logo</item>
+        <!-- Route back to the normal manifest theme after splash -->
+        <item name="postSplashScreenTheme">@style/Theme.SplitEasy</item>
+    </style>
+</resources>
