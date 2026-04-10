@@ -10,7 +10,7 @@ from firebase_admin import credentials, auth
 security = HTTPBearer()
 
 # Initialize Firebase Admin if credentials are provided
-firebase_cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
+firebase_cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH", "firebase-admin.json")
 if firebase_cred_path and os.path.exists(firebase_cred_path) and not firebase_admin._apps:
     cred = credentials.Certificate(firebase_cred_path)
     firebase_admin.initialize_app(cred)

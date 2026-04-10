@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import com.spliteasy.ui.viewmodels.DashboardViewModel
 @Composable
 fun DashboardScreen(
     onGroupClick: (Int) -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: DashboardViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -35,6 +37,11 @@ fun DashboardScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Dashboard", fontWeight = FontWeight.Black, fontSize = 28.sp) },
+                actions = {
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
@@ -67,10 +74,24 @@ fun DashboardScreen(
                     }
                 }
                 is DashboardState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Error: ${dashboardState.message}", color = MaterialTheme.colorScheme.error)
-                        Button(onClick = { viewModel.loadGroups() }, modifier = Modifier.padding(top = 16.dp)) {
-                            Text("Retry")
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Error: ${dashboardState.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp)
+                        )
+                        Spacer(modifier = Modifier.height(64.dp))
+                        Button(
+                            onClick = { viewModel.loadGroups() },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.height(56.dp).fillMaxWidth(0.5f)
+                        ) {
+                            Text("Retry", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -106,8 +127,7 @@ fun DashboardScreen(
                                     ) {
                                         Column {
                                             Text(group.groupName, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text("Creator: ${group.createdBy}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            // No Creator shown per request
                                         }
                                         Box(
                                             modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),

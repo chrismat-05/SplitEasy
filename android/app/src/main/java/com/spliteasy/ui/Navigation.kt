@@ -10,6 +10,7 @@ import com.spliteasy.ui.screens.AddExpenseScreen
 import com.spliteasy.ui.screens.DashboardScreen
 import com.spliteasy.ui.screens.GroupDetailScreen
 import com.spliteasy.ui.screens.LoginScreen
+import com.spliteasy.ui.screens.SettingsScreen
 
 @Composable
 fun SplitEasyApp() {
@@ -30,6 +31,20 @@ fun SplitEasyApp() {
             DashboardScreen(
                 onGroupClick = { groupId ->
                     navController.navigate("group_detail/$groupId")
+                },
+                onSettingsClick = {
+                    navController.navigate("settings")
+                }
+            )
+        }
+
+        composable("settings") {
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo("dashboard") { inclusive = true }
+                    }
                 }
             )
         }

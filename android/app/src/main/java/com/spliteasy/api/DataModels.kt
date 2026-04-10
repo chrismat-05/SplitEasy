@@ -52,7 +52,7 @@ data class ExpenseResponse(
     @SerializedName("paid_by") val paidBy: Int,
     val amount: Int,
     val description: String,
-    @SerializedName("date_added") val dateAdded: String
+    @SerializedName("created_at") val dateAdded: String
 )
 
 data class DashboardBalanceResponse(

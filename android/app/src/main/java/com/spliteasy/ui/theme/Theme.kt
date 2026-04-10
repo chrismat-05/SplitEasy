@@ -12,27 +12,27 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Emerald,
-    secondary = DarkEmerald,
-    tertiary = Rose,
-    background = DeepNavy,
-    surface = Slate,
-    surfaceVariant = LightSlate,
-    onPrimary = DeepNavy,
-    onBackground = Pearl,
-    onSurface = Pearl
+    primary = White,
+    secondary = LightGrey,
+    tertiary = MediumGrey,
+    background = Black,
+    surface = DarkGrey,
+    surfaceVariant = MediumGrey,
+    onPrimary = Black,
+    onBackground = White,
+    onSurface = White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DeepNavy,
-    secondary = Slate,
-    tertiary = Emerald,
-    background = Pearl,
-    surface = Color.White,
-    surfaceVariant = LightPearl,
-    onPrimary = Color.White,
-    onBackground = DeepNavy,
-    onSurface = DeepNavy
+    primary = Black,
+    secondary = MediumGrey,
+    tertiary = LightGrey,
+    background = OffWhite,
+    surface = White,
+    surfaceVariant = LightGrey,
+    onPrimary = White,
+    onBackground = Black,
+    onSurface = Black
 )
 
 @Composable

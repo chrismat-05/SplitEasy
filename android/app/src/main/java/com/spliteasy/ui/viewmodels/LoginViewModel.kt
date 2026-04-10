@@ -3,6 +3,7 @@ package com.spliteasy.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.spliteasy.api.NetworkErrorMapper
 import com.spliteasy.api.RetrofitClient
 import com.spliteasy.api.UserCreate
 import kotlinx.coroutines.delay
@@ -50,20 +51,19 @@ class LoginViewModel : ViewModel() {
                 // 3. Mount Token to Retrofit Interceptor
                 RetrofitClient.currentMemberUid = idToken
 
-                // 4. Sync Profile to FastAPI Backend if Sign Up
-                if (isSignUp) {
-                    try {
-                        RetrofitClient.apiService.createUser(UserCreate(user.uid, name, email))
-                    } catch (e: Exception) {
-                        // Ignore backend unique constraint duplicates if they previously signed up
-                    }
+                // 4. Sync Profile to FastAPI Backend (Always attempt to ensure record exists)
+                try {
+                    val displayName = if (isSignUp) name else email.substringBefore("@")
+                    RetrofitClient.apiService.createUser(UserCreate(user.uid, displayName, email))
+                } catch (e: Exception) {
+                    // Ignore errors (e.g. 400 User already registered)
                 }
 
                 delay(500) // Premium UX delay
                 _state.value = LoginState.Success
 
             } catch (e: Exception) {
-                _state.value = LoginState.Error(e.message ?: "Authentication Failed")
+                _state.value = LoginState.Error(NetworkErrorMapper.map(e))
             }
         }
     }

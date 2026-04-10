@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
 }
 
 android {
@@ -30,7 +31,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.spliteasy.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.0.132:8000\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.0.118:8000\"")
         }
     }
     compileOptions {
@@ -43,9 +44,6 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
     }
     packaging {
         resources {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spliteasy.api.ExpenseCreate
 import com.spliteasy.api.GroupMemberResponse
+import com.spliteasy.api.NetworkErrorMapper
 import com.spliteasy.api.RetrofitClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,7 @@ class AddExpenseViewModel : ViewModel() {
                 cachedMembers = RetrofitClient.apiService.getGroupMembers(groupId)
                 _state.value = TransferState.Ready(cachedMembers)
             } catch (e: Exception) {
-                _state.value = TransferState.Error("Failed to fetch group directory", null)
+                _state.value = TransferState.Error(NetworkErrorMapper.map(e), null)
             }
         }
     }
@@ -57,7 +58,7 @@ class AddExpenseViewModel : ViewModel() {
                 delay(600)
                 _state.value = TransferState.Success
             } catch (e: Exception) {
-                _state.value = TransferState.Error("Network Error", cachedMembers)
+                _state.value = TransferState.Error(NetworkErrorMapper.map(e), cachedMembers)
             }
         }
     }
