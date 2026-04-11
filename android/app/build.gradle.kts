@@ -31,7 +31,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.spliteasy.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.0.118:8000\"")
+            buildConfigField("String", "BASE_URL", "\"http://172.18.4.123:8000\"")
         }
     }
     compileOptions {

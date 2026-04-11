@@ -7,13 +7,16 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import com.spliteasy.ui.SettingsManager
 
 private val DarkColorScheme = darkColorScheme(
     primary = White,
-    secondary = LightGrey,
+    secondary = Emerald,
     tertiary = MediumGrey,
     background = Black,
     surface = DarkGrey,
@@ -27,9 +30,9 @@ private val LightColorScheme = lightColorScheme(
     primary = Black,
     secondary = MediumGrey,
     tertiary = LightGrey,
-    background = OffWhite,
-    surface = White,
-    surfaceVariant = LightGrey,
+    background = White,
+    surface = LightGrey,
+    surfaceVariant = MediumGrey,
     onPrimary = White,
     onBackground = Black,
     onSurface = Black
@@ -37,9 +40,17 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun SplitEasyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val themeMode by SettingsManager.themeMode.collectAsState(initial = "Dark")
+    val isSystemDark = isSystemInDarkTheme()
+    
+    val darkTheme = when(themeMode) {
+        "Light" -> false
+        "Dark" -> true
+        else -> isSystemDark
+    }
+
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     val view = LocalView.current
     

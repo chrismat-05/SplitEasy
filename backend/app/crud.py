@@ -5,11 +5,14 @@ import random
 def get_user(db: Session, user_uid: str):
     return db.query(models.User).filter(models.User.uid == user_uid).first()
 
-def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(uid=user.uid, name=user.name, email=user.email)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+def update_user(db: Session, user_uid: str, name: str):
+    db_user = db.query(models.User).filter(models.User.uid == user_uid).first()
+    if db_user:
+        db_user.name = name
+        # Also update GroupMember names for this user across all groups
+        db.query(models.GroupMember).filter(models.GroupMember.user_id == user_uid).update({"name": name})
+        db.commit()
+        db.refresh(db_user)
     return db_user
 
 def create_group(db: Session, group: schemas.GroupCreate, current_user_uid: str):

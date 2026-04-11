@@ -71,4 +71,19 @@ class LoginViewModel : ViewModel() {
     fun resetState() {
         _state.value = LoginState.Idle
     }
+
+    fun sendPasswordReset(email: String) {
+        if (email.isBlank()) {
+            _state.value = LoginState.Error("Enter your email first")
+            return
+        }
+        viewModelScope.launch {
+            try {
+                auth.sendPasswordResetEmail(email).await()
+                _state.value = LoginState.Error("Reset link sent to your email") // Using Error state to show message for simplicity
+            } catch (e: Exception) {
+                _state.value = LoginState.Error(NetworkErrorMapper.map(e))
+            }
+        }
+    }
 }

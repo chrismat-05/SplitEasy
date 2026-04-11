@@ -23,10 +23,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.spliteasy.api.DashboardBalanceResponse
 import com.spliteasy.api.ExpenseResponse
 import com.spliteasy.api.GroupMemberResponse
+import com.spliteasy.ui.SettingsManager
 import com.spliteasy.ui.viewmodels.GroupDetailViewModel
 import com.spliteasy.ui.viewmodels.LedgerState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,8 +42,10 @@ fun GroupDetailScreen(
     viewModel: GroupDetailViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val currencySymbol = SettingsManager.getCurrencySymbol()
     var showAddMemberDialog by remember { mutableStateOf(false) }
     var selectedExpense by remember { mutableStateOf<ExpenseResponse?>(null) }
+    var selectedBalanceMember by remember { mutableStateOf<DashboardBalanceResponse?>(null) }
 
     LaunchedEffect(groupId) {
         viewModel.loadLedger(groupId)
@@ -178,13 +185,14 @@ fun GroupDetailScreen(
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
+                                            .clickable { selectedBalanceMember = balance }
+                                            .padding(vertical = 12.dp, horizontal = 16.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(balance.name, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                                         Text(
-                                            text = if (isPositive) "+$${balance.balance}" else if (isNeutral) "Settled" else "-$${Math.abs(balance.balance)}",
+                                            text = if (isPositive) "+$currencySymbol${balance.balance}" else if (isNeutral) "Settled" else "-$currencySymbol${Math.abs(balance.balance)}",
                                             fontWeight = FontWeight.Black,
                                             fontSize = 18.sp,
                                             color = valColor
@@ -223,7 +231,7 @@ fun GroupDetailScreen(
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text("Paid by ${paidByMember?.name ?: "#${expense.paidBy}"}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
-                                    Text("$${expense.amount}", fontWeight = FontWeight.Black, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
+                                    Text("$currencySymbol${expense.amount}", fontWeight = FontWeight.Black, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
                                 }
                             }
                         }
@@ -231,7 +239,69 @@ fun GroupDetailScreen(
                 }
             }
         }
+        if (selectedBalanceMember != null) {
+            SettleDebtDialog(
+                member = selectedBalanceMember!!,
+                onDismiss = { selectedBalanceMember = null },
+                onSettle = { amount ->
+                    val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+                    val currentUser = (state as? LedgerState.Success)?.members?.find { it.userId == auth.currentUser?.uid }
+                    if (currentUser != null && selectedBalanceMember != null) {
+                        // If selected member has negative balance, THEY owe money -> WE receive
+                        // If selected member has positive balance, THEY are owed money -> WE pay
+                        if (selectedBalanceMember!!.balance > 0) {
+                            // We pay them
+                            viewModel.settleDebt(currentUser.memberId, selectedBalanceMember!!.memberId, amount)
+                        } else {
+                            // They pay us
+                            viewModel.settleDebt(selectedBalanceMember!!.memberId, currentUser.memberId, amount)
+                        }
+                    }
+                    selectedBalanceMember = null
+                }
+            )
+        }
     }
+}
+
+@Composable
+fun SettleDebtDialog(
+    member: com.spliteasy.api.DashboardBalanceResponse,
+    onDismiss: () -> Unit,
+    onSettle: (Int) -> Unit
+) {
+    var amount by remember { mutableStateOf("") }
+    val currencySymbol = SettingsManager.getCurrencySymbol()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Settle with ${member.name}", fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                Text("Enter the amount paid to/by this person.", fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { if (it.all { char -> char.isDigit() }) amount = it },
+                    label = { Text("Amount ($currencySymbol)") },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onSettle(amount.toIntOrNull() ?: 0) }) {
+                Text("Settle")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        shape = RoundedCornerShape(24.dp)
+    )
 }
 
 @Composable
@@ -240,6 +310,7 @@ fun ExpenseDetailDialog(
     members: List<GroupMemberResponse>,
     onDismiss: () -> Unit
 ) {
+    val currencySymbol = SettingsManager.getCurrencySymbol()
     val paidByMember = members.find { it.memberId == expense.paidBy }
     val splitAmount = if (members.isNotEmpty()) expense.amount.toDouble() / members.size else 0.0
 
@@ -270,7 +341,7 @@ fun ExpenseDetailDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "$${expense.amount}",
+                    text = "$currencySymbol${expense.amount}",
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.primary
@@ -331,7 +402,7 @@ fun ExpenseDetailDialog(
                             fontWeight = if (member.memberId == expense.paidBy) FontWeight.Bold else FontWeight.Normal
                         )
                         Text(
-                            "$${"%.2f".format(splitAmount)}",
+                            "$currencySymbol${"%.2f".format(splitAmount)}",
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )

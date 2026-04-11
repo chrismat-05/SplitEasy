@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 
+import com.spliteasy.ui.SettingsManager
+import kotlinx.coroutines.launch
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -29,12 +32,18 @@ fun SettingsScreen(
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
     
+    val currentCurrency by SettingsManager.currency.collectAsState(initial = "USD ($)")
+    val currentTheme by SettingsManager.themeMode.collectAsState(initial = "Light")
+    val scope = rememberCoroutineScope()
+    
     var userName by remember { mutableStateOf(user?.displayName ?: user?.email?.substringBefore("@") ?: "User") }
     var showNameDialog by remember { mutableStateOf(false) }
-    var selectedCurrency by remember { mutableStateOf("USD ($)") }
     var showCurrencyDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
 
     val currencies = listOf("USD ($)", "EUR (€)", "GBP (£)", "INR (₹)", "JPY (¥)", "CAD ($)", "AUD ($)")
+    val themes = listOf("Dark", "Light")
 
     Scaffold(
         topBar = {
@@ -101,20 +110,14 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Payments,
                     title = "Currency",
-                    subtitle = selectedCurrency,
+                    subtitle = currentCurrency,
                     onClick = { showCurrencyDialog = true }
-                )
-                SettingsItem(
-                    icon = Icons.Default.Notifications,
-                    title = "Notifications",
-                    subtitle = "Manage alerts and updates",
-                    onClick = { /* Handle Notifications */ }
                 )
                 SettingsItem(
                     icon = Icons.Default.Palette,
                     title = "Appearance",
-                    subtitle = "System theme",
-                    onClick = { /* Handle Theme */ }
+                    subtitle = currentTheme,
+                    onClick = { showThemeDialog = true }
                 )
             }
 
@@ -123,14 +126,8 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Security,
                     title = "Privacy & Security",
-                    subtitle = "Passwords and data sharing",
-                    onClick = { /* Handle Privacy */ }
-                )
-                SettingsItem(
-                    icon = Icons.Default.Help,
-                    title = "Help & Support",
-                    subtitle = "FAQs and contact us",
-                    onClick = { /* Handle Help */ }
+                    subtitle = "Change password and more",
+                    onClick = { showChangePasswordDialog = true }
                 )
             }
 
@@ -181,12 +178,79 @@ fun SettingsScreen(
                     Button(onClick = {
                         userName = tempName
                         showNameDialog = false
+                        // Sync to backend
+                        val user = auth.currentUser
+                        if (user != null) {
+                            scope.launch {
+                                try {
+                                    com.spliteasy.api.RetrofitClient.apiService.updateMe(
+                                        com.spliteasy.api.UserCreate(user.uid, tempName, user.email ?: "")
+                                    )
+                                } catch (e: Exception) {}
+                            }
+                        }
                     }) {
                         Text("Save")
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showNameDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        // Theme selection dialog
+        if (showThemeDialog) {
+            AlertDialog(
+                onDismissRequest = { showThemeDialog = false },
+                title = { Text("Select Theme") },
+                text = {
+                    Column {
+                        themes.forEach { theme ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        SettingsManager.setThemeMode(theme)
+                                        showThemeDialog = false
+                                    }
+                                    .padding(vertical = 12.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = currentTheme == theme,
+                                    onClick = null
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(theme)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {}
+            )
+        }
+
+        // Change Password Dialog
+        if (showChangePasswordDialog) {
+            AlertDialog(
+                onDismissRequest = { showChangePasswordDialog = false },
+                title = { Text("Reset Password") },
+                text = { Text("A password reset link will be sent to your email (${user?.email}).") },
+                confirmButton = {
+                    Button(onClick = {
+                        user?.email?.let { email ->
+                            auth.sendPasswordResetEmail(email)
+                        }
+                        showChangePasswordDialog = false
+                    }) {
+                        Text("Send Link")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showChangePasswordDialog = false }) {
                         Text("Cancel")
                     }
                 }
@@ -205,14 +269,14 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedCurrency = currency
+                                        SettingsManager.setCurrency(currency)
                                         showCurrencyDialog = false
                                     }
                                     .padding(vertical = 12.dp, horizontal = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
-                                    selected = selectedCurrency == currency,
+                                    selected = currentCurrency == currency,
                                     onClick = null
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))

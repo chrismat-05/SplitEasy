@@ -3,6 +3,7 @@ package com.spliteasy.api
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -11,6 +12,9 @@ interface ApiService {
 
     @GET("/users/me")
     suspend fun getMe(): UserResponse
+
+    @PUT("/users/me")
+    suspend fun updateMe(@Body user: UserCreate): UserResponse
 
     @POST("/groups/")
     suspend fun createGroup(@Body group: GroupCreate): GroupResponse
@@ -35,6 +39,12 @@ interface ApiService {
 
     @GET("/groups/{group_id}/expenses")
     suspend fun getGroupExpenses(@Path("group_id") groupId: Int): List<ExpenseResponse>
+
+    @POST("/groups/{group_id}/settlements")
+    suspend fun addSettlement(
+        @Path("group_id") groupId: Int,
+        @Body settlement: SettlementCreate
+    ): SettlementResponse
 
     @GET("/groups/{group_id}/dashboard")
     suspend fun getGroupDashboard(@Path("group_id") groupId: Int): List<DashboardBalanceResponse>

@@ -177,6 +177,21 @@ fun LoginScreen(
                                 }
                             }
                     )
+                    
+                    if (!isSignUp) {
+                        Text(
+                            text = "Forgot Password?",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .clickable { viewModel.sendPasswordReset(email) },
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (state is LoginState.Error) {

@@ -55,6 +55,21 @@ data class ExpenseResponse(
     @SerializedName("created_at") val dateAdded: String
 )
 
+data class SettlementCreate(
+    @SerializedName("from_member_id") val fromMemberId: Int,
+    @SerializedName("to_member_id") val toMemberId: Int,
+    val amount: Int
+)
+
+data class SettlementResponse(
+    @SerializedName("settlement_id") val settlementId: Int,
+    @SerializedName("group_id") val groupId: Int,
+    @SerializedName("from_member_id") val fromMemberId: Int,
+    @SerializedName("to_member_id") val toMemberId: Int,
+    val amount: Int,
+    @SerializedName("created_at") val createdAt: String
+)
+
 data class DashboardBalanceResponse(
     @SerializedName("member_id") val memberId: Int,
     val name: String,

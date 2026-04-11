@@ -40,6 +40,11 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 def get_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
+@app.put("/users/me", response_model=schemas.UserResponse)
+def update_me(user_update: schemas.UserCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # Re-using UserCreate for simplicity, but only name is updated in crud usually
+    return crud.update_user(db=db, user_uid=current_user.uid, name=user_update.name)
+
 # --- Groups ---
 @app.post("/groups/", response_model=schemas.GroupResponse)
 def create_group(group: schemas.GroupCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):

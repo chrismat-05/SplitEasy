@@ -8,6 +8,7 @@ import com.spliteasy.api.GroupMemberCreate
 import com.spliteasy.api.GroupMemberResponse
 import com.spliteasy.api.NetworkErrorMapper
 import com.spliteasy.api.RetrofitClient
+import com.spliteasy.api.SettlementCreate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,6 +58,18 @@ class GroupDetailViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Handle error if needed, for now we just fail silently or could update state
             }
+        }
+    }
+
+    fun settleDebt(fromMemberId: Int, toMemberId: Int, amount: Int) {
+        val groupId = currentGroupId ?: return
+        if (amount <= 0) return
+
+        viewModelScope.launch {
+            try {
+                RetrofitClient.apiService.addSettlement(groupId, SettlementCreate(fromMemberId, toMemberId, amount))
+                loadLedger(groupId)
+            } catch (e: Exception) {}
         }
     }
 }
